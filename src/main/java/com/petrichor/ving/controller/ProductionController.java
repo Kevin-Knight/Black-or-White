@@ -9,13 +9,16 @@ import com.petrichor.ving.domain.Production;
 import com.petrichor.ving.domain.Relation;
 import com.petrichor.ving.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @RestController
+@RequestMapping("/production")
 public class ProductionController {
     @Autowired
     ProductionRepos productionRepos;
@@ -26,7 +29,8 @@ public class ProductionController {
     @Autowired
     AlbumRepos albumRepos;
 
-    List<Production> findByUserName(String name){
+    @RequestMapping("/findByUserName")  //通过用户名查询作品
+    public List<Production> findByUserName(String name){
         List<User> users=userRepos.findByUName(name);//获得用户名对应的所有用户
         List<Production> productions= new ArrayList<>();//用来存储最终作品结果的数组
         for (User user : users) {
@@ -40,7 +44,8 @@ public class ProductionController {
         return productions;
     }
 
-    List<Production> findByAlbumName(String name){
+    @RequestMapping("/findByAlbumName")     //通过专辑名查询作品
+    public List<Production> findByAlbumName(String name){
         List<Album> albums=albumRepos.findByAName(name);//找到这个专辑名对应的所有专辑
         List<Production> productions=new ArrayList<>();//用来存储最终作品结果的数组
         for (Album album : albums){
@@ -53,13 +58,39 @@ public class ProductionController {
         return productions;
     }
 
-    Production findByPtag(String pTag){
-
-        return new Production();
+    @RequestMapping("/findByPTag")      //通过标签查询作品
+    public List<Production> findByPTag(String pTag){
+        return productionRepos.findByPTag(pTag);
     }
 
-    Production findByPName(String name){
-
-        return new Production();
+    @RequestMapping("/findByPName")     //通过作品名查询作品
+    public List<Production> findByPName(String name){
+        return productionRepos.findByPName(name);
     }
+
+    @RequestMapping("/delete")      //通过作品对象删除作品
+    public void delete(Production production){
+        productionRepos.delete(production);
+    }
+
+    @RequestMapping("/setPVisibility") //更新作品的可见性
+    public void setPVisibility(String PID,String visibility){
+        Optional<Production> optional=productionRepos.findById(PID);
+        if(optional.isPresent()){
+            Production production=optional.get();
+            production.setpVisibility(visibility);
+            productionRepos.save(production);
+        }
+    }
+
+    @RequestMapping("/setPCover")
+    public void setPCover(String PID,String PCover, MultipartFile img){
+        Optional<Production> optional=productionRepos.findById(PID);
+        if(optional.isPresent()){
+            Production production=optional.get();
+            production.setpCover(PCover);
+            productionRepos.save(production);
+        }
+    }
+
 }
