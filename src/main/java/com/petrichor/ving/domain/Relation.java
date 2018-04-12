@@ -9,8 +9,6 @@ public class Relation {
     @Id
     @Column(name = "RID")
     private String rId;
-    @Column(name = "UID")
-    private String uId;
     @Column(name = "PID")
     private String pId;
     @Column(name = "AID")
@@ -22,14 +20,6 @@ public class Relation {
 
     public void setrId(String rId) {
         this.rId = rId;
-    }
-
-    public String getuId() {
-        return uId;
-    }
-
-    public void setuId(String uId) {
-        this.uId = uId;
     }
 
     public String getpId() {

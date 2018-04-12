@@ -9,6 +9,8 @@ public class Album {
     @Id
     @Column(name="AID")
     private String aId;
+    @Column(name = "UID")
+    private String uId;
     @Column(name = "AName")
     private String aName;
     @Column(name = "AVisibility")
@@ -30,6 +32,14 @@ public class Album {
 
     public void setaId(String aId) {
         this.aId = aId;
+    }
+
+    public String getuId() {
+        return uId;
+    }
+
+    public void setuId(String uId) {
+        this.uId = uId;
     }
 
     public String getaName() {
@@ -71,4 +81,5 @@ public class Album {
     public void setaDescription(String aDescription) {
         this.aDescription = aDescription;
     }
+
 }

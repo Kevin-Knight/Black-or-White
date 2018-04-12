@@ -6,8 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface RelationRepos extends JpaRepository<Relation, String> {
-    List<Relation> findByUId(String UId);
-    List<Relation> findByUIdAndAId(String UId, String AId);
-    List<Relation> findByUIdAndPId(String UId, String PId);
-    List<Relation> findByUIdAndPIdAndAId(String UId, String AId, String PId);
+    List<Relation> findByAId(String AId);
+    List<Relation> findByPId(String PId);
 }

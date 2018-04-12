@@ -9,6 +9,8 @@ public class Production {
     @Id
     @Column(name = "PID")
     private String pId;
+    @Column(name = "UID")
+    private String uId;
     @Column(name = "PName")
     private String pName;
     @Column(name = "PVisibility")
@@ -26,6 +28,14 @@ public class Production {
 
     public void setpId(String pId) {
         this.pId = pId;
+    }
+
+    public String getuId() {
+        return uId;
+    }
+
+    public void setuId(String uId) {
+        this.uId = uId;
     }
 
     public String getpName() {

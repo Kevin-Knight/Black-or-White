@@ -7,6 +7,7 @@ import java.util.List;
 
 public interface AlbumRepos extends JpaRepository<Album,String>{
     List<Album> findByAName(String AName);
+    List<Album> findByUId(String UId);
     List<Album> findByATag(String ATag);
     List<Album> findByACover(String ACover);
 }
