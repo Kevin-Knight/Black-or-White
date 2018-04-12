@@ -34,10 +34,7 @@ public class ProductionController {
         List<User> users=userRepos.findByUName(name);//获得用户名对应的所有用户
         List<Production> productions= new ArrayList<>();//用来存储最终作品结果的数组
         for (User user : users) {
-            List<Production> list = productionRepos.findByUId(user.getuId());//获得一个用户对应的所有产品
-            for (Production production: list){
-                productions.add(production);//如果查询到了作品，则将其加入productions
-            }
+            productions.addAll(productionRepos.findByUId(user.getuId()));
         }
 
         return productions;
