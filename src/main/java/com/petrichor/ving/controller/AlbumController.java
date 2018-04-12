@@ -82,13 +82,24 @@ public class AlbumController {
         return true;
     }
 
+    /** 更加专辑名查找专辑
+     * @param aName 专辑名
+     * @return  返回找到的专辑集合
+     */
+    @CrossOrigin
+    @RequestMapping("/findAlbumsByAlbumName")
+    public List<Album> findAlbumsByAlbumName (String aName) {
+        List<Album> albums = albumRepos.findByAName(aName);
+        return albums;
+    }
+
     /** 根据专辑名查找作品
      * @param aName 专辑名
      * @return  返回找到的作品集合
      */
     @CrossOrigin
-    @RequestMapping("/findByAlbumName")
-    public List<Production> findByAlbumName (String aName) {
+    @RequestMapping("/findProductionsByAlbumName")
+    public List<Production> findProductionsByAlbumName (String aName) {
         List<Production> productions= new ArrayList<>();
         List<Album> albums = albumRepos.findByAName(aName);
         //若该专辑名不存在则直接返回空集合
@@ -102,8 +113,42 @@ public class AlbumController {
 
         //返回作品集合
         for (Relation relation : relations) {
-            productions.add(productionRepos.findByPId(relation.getpId()));
+            Optional<Production> productionOpt = productionRepos.findByPId(relation.getpId());
+            if (productionOpt.isPresent()) productions.add(productionOpt.get());
         }
         return productions;
+    }
+
+    /** 将作品添加到专辑
+     * @param aId   专辑Id
+     * @param pIds  作品Id
+     * @return  若添加成功则返回true，否则返回false
+     */
+    @CrossOrigin
+    @RequestMapping("/addProductionsToAlbum")
+    public boolean addProductionsToAlbum (String aId, List<String> pIds) {
+        //若专辑Id不存在或添加的作品集为空，则返回false
+        if (! albumRepos.findByAId(aId).isPresent() || pIds.isEmpty()) return false;
+
+        Relation relation = new Relation();
+        String str = "R-";
+        for (String pId: pIds) {
+            //若作品Id对应的作品不存在则返回false
+            if (! productionRepos.findByPId(pId).isPresent()) return false;
+
+            str = "R-"+ UUID.randomUUID().toString().replace("-", "").substring(0, 10);;
+            while (relationRepos.findByRId(str).isPresent()) {
+                str = "R-"+ UUID.randomUUID().toString().replace("-", "").substring(0, 10);;
+            }
+            relation.setrId(str);
+            relation.setaId(aId);
+            relation.setpId(pId);
+            relationRepos.save(relation);
+
+            //若添加作品至专辑失败，则返回false
+            if (! relationRepos.findByRId(str).isPresent()) return false;
+        }
+
+        return true;
     }
 }
