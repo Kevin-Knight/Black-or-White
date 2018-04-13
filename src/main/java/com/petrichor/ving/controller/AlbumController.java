@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,19 +45,17 @@ public class AlbumController {
         if (! userOpt.isPresent()) return false;
 
         //生成不重复的专辑ID并添加专辑信息
-        String str = "A-"+ UUID.randomUUID().toString().replace("-", "").substring(0, 10);;
+        String str = "A-"+ UUID.randomUUID().toString().replace("-", "").substring(0, 10);
         Optional<Album> albumOpt = albumRepos.findById(str);
         while (albumOpt.isPresent()) {
-            str = "A-"+ UUID.randomUUID().toString().replace("-", "").substring(0, 10);;
+            str = "A-"+ UUID.randomUUID().toString().replace("-", "").substring(0, 10);
             albumOpt = albumRepos.findById(str);
         }
         album.setaId(str);
         albumRepos.save(album);
         //检查是否添加成功
         albumOpt = albumRepos.findById(str);
-        if (! albumOpt.isPresent()) return false;
-
-        return true;
+        return albumOpt.isPresent();
     }
 
     /** 删除指定专辑
@@ -78,8 +77,7 @@ public class AlbumController {
         albumRepos.deleteById(aId);
         Optional<Album> albumOpt = albumRepos.findById(aId);
         //检查是否删除成功
-        if (albumOpt.isPresent()) return false;
-        return true;
+        return !albumOpt.isPresent();
     }
 
     /** 更加专辑名查找专辑
@@ -89,8 +87,7 @@ public class AlbumController {
     @CrossOrigin
     @RequestMapping("/findAlbumsByAlbumName")
     public List<Album> findAlbumsByAlbumName (String aName) {
-        List<Album> albums = albumRepos.findByAName(aName);
-        return albums;
+        return albumRepos.findByAName(aName);
     }
 
     /** 根据专辑名查找作品
@@ -114,7 +111,7 @@ public class AlbumController {
         //返回作品集合
         for (Relation relation : relations) {
             Optional<Production> productionOpt = productionRepos.findByPId(relation.getpId());
-            if (productionOpt.isPresent()) productions.add(productionOpt.get());
+            productionOpt.ifPresent(productions::add);
         }
         return productions;
     }
@@ -131,14 +128,14 @@ public class AlbumController {
         if (! albumRepos.findByAId(aId).isPresent() || pIds.isEmpty()) return false;
 
         Relation relation = new Relation();
-        String str = "R-";
+        String str;
         for (String pId: pIds) {
             //若作品Id对应的作品不存在则返回false
             if (! productionRepos.findByPId(pId).isPresent()) return false;
 
-            str = "R-"+ UUID.randomUUID().toString().replace("-", "").substring(0, 10);;
+            str = "R-"+ UUID.randomUUID().toString().replace("-", "").substring(0, 10);
             while (relationRepos.findByRId(str).isPresent()) {
-                str = "R-"+ UUID.randomUUID().toString().replace("-", "").substring(0, 10);;
+                str = "R-"+ UUID.randomUUID().toString().replace("-", "").substring(0, 10);
             }
             relation.setrId(str);
             relation.setaId(aId);
@@ -177,6 +174,69 @@ public class AlbumController {
             if (relationRepos.findByAIdAAndPId(aId, pId).isPresent()) return false;
         }
         return true;
+    }
+
+    /** 设置专辑可见性
+     * @param aId   专辑Id
+     * @param aVisibility   拟设置的专辑可见性
+     * @return  若设置成功则返回true，否则返回false
+     */
+    @CrossOrigin
+    @RequestMapping("/setAVisibility")
+    public boolean setAVisibility (String aId, String aVisibility) {
+        //若专辑Id不存在或可见性不符合要求，则返回false
+        Optional<Album> albumOpt = albumRepos.findById(aId);
+        if (! albumOpt.isPresent() || aVisibility.length()!=1) return false;
+
+        //设置描述并保存
+        Album album = albumOpt.get();
+        album.setaVisibility(aVisibility);
+        albumRepos.save(album);
+
+        //若设置描述失败则返回false
+        return albumOpt.get().getaVisibility().equals(aVisibility);
+    }
+
+    /** 为专辑设置标签
+     * @param aId   专辑Id
+     * @param aTag  拟设置的标签
+     * @return  若设置成功则返回true，否则返回false
+     */
+    @CrossOrigin
+    @RequestMapping("/setATag")
+    public boolean setATag(String aId, String aTag) {
+        //若专辑Id不存在或标签值为空，则返回false
+        Optional<Album> albumOpt = albumRepos.findById(aId);
+        if (! albumOpt.isPresent() || aTag.length()==0) return false;
+
+        //设置标签并保存
+        Album album = albumOpt.get();
+        album.setaTag(aTag);
+        albumRepos.save(album);
+
+        //若设置标签失败则返回false
+        return albumRepos.findByAId(aId).get().getaTag().equals(aTag);
+    }
+
+    /** 设置专辑描述
+     * @param aId           专辑Id
+     * @param aDesciption   拟设置的描述
+     * @return  若设置成功则返回true，否则返回false
+     */
+    @CrossOrigin
+    @RequestMapping("/setADescription")
+    public boolean setADescription (String aId, String aDesciption) {
+        //若专辑Id不存在或描述值为空，则返回false
+        Optional<Album> albumOpt = albumRepos.findById(aId);
+        if (! albumOpt.isPresent() || aDesciption.length()==0) return false;
+
+        //设置描述并保存
+        Album album = albumOpt.get();
+        album.setaDescription(aDesciption);
+        albumRepos.save(album);
+
+        //若设置描述失败则返回false
+        return albumRepos.findByAId(aId).get().getaDescription().equals(aDesciption);
     }
 
 }

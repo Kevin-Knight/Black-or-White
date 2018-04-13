@@ -14,7 +14,7 @@ public class Album {
     @Column(name = "AName")
     private String aName;
     @Column(name = "AVisibility")
-    private int aVisibility;
+    private String aVisibility;
     @Column(name = "ATag")
     private String aTag;
     @Column(name = "ACover")
@@ -50,11 +50,11 @@ public class Album {
         this.aName = aName;
     }
 
-    public int getaVisibility() {
+    public String getaVisibility() {
         return aVisibility;
     }
 
-    public void setaVisibility(int aVisibility) {
+    public void setaVisibility(String aVisibility) {
         this.aVisibility = aVisibility;
     }
 
