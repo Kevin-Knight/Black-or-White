@@ -22,7 +22,9 @@ import java.util.UUID;
 /** 对专辑进行增删改查的操作
  *  addAlbum(User user, Album album) 为指定用户增加新的专辑
  */
+@CrossOrigin
 @RestController
+@RequestMapping("/album")
 public class AlbumController {
     @Autowired
     RelationRepos relationRepos;
@@ -37,7 +39,7 @@ public class AlbumController {
      * @param album 作品信息
      * @return  若添加成功则返回true，否则返回false
      */
-    @CrossOrigin
+    
     @RequestMapping("/addAlbum")
     public boolean addAlbum(Album album) {
         //检查用户是否存在
@@ -62,7 +64,7 @@ public class AlbumController {
      * @param aId 作品信息
      * @return  若删除成功则返回true，否则返回false
      */
-    @CrossOrigin
+    
     @RequestMapping("/deleteAlbum")
     public boolean deleteAlbum(String aId) {
         //删除专辑-作品关系中的专辑记录
@@ -84,7 +86,7 @@ public class AlbumController {
      * @param aName 专辑名
      * @return  返回找到的专辑集合
      */
-    @CrossOrigin
+    
     @RequestMapping("/findAlbumsByAlbumName")
     public List<Album> findAlbumsByAlbumName (String aName) {
         return albumRepos.findByAName(aName);
@@ -94,7 +96,7 @@ public class AlbumController {
      * @param aName 专辑名
      * @return  返回找到的作品集合
      */
-    @CrossOrigin
+    
     @RequestMapping("/findProductionsByAlbumName")
     public List<Production> findProductionsByAlbumName (String aName) {
         List<Production> productions= new ArrayList<>();
@@ -121,7 +123,7 @@ public class AlbumController {
      * @param pIds  作品Id
      * @return  若添加成功则返回true，否则返回false
      */
-    @CrossOrigin
+    
     @RequestMapping("/addProductionsToAlbum")
     public boolean addProductionsToAlbum (String aId, List<String> pIds) {
         //若专辑Id不存在或添加的作品集为空，则返回false
@@ -154,7 +156,7 @@ public class AlbumController {
      * @param pIds  作品Id
      * @return  若添加成功则返回true，否则返回false
      */
-    @CrossOrigin
+    
     @RequestMapping("/removeProductionsFromAlbum")
     public boolean removeProductionsFromAlbum(String aId, List<String> pIds) {
         //若专辑Id不存在或添加的作品集为空，则返回false
@@ -181,7 +183,7 @@ public class AlbumController {
      * @param aVisibility   拟设置的专辑可见性
      * @return  若设置成功则返回true，否则返回false
      */
-    @CrossOrigin
+    
     @RequestMapping("/setAVisibility")
     public boolean setAVisibility (String aId, String aVisibility) {
         //若专辑Id不存在或可见性不符合要求，则返回false
@@ -202,7 +204,7 @@ public class AlbumController {
      * @param aTag  拟设置的标签
      * @return  若设置成功则返回true，否则返回false
      */
-    @CrossOrigin
+    
     @RequestMapping("/setATag")
     public boolean setATag(String aId, String aTag) {
         //若专辑Id不存在或标签值为空，则返回false
@@ -223,7 +225,7 @@ public class AlbumController {
      * @param aDesciption   拟设置的描述
      * @return  若设置成功则返回true，否则返回false
      */
-    @CrossOrigin
+    
     @RequestMapping("/setADescription")
     public boolean setADescription (String aId, String aDesciption) {
         //若专辑Id不存在或描述值为空，则返回false
