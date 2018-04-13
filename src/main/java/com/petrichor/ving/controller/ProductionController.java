@@ -9,6 +9,7 @@ import com.petrichor.ving.domain.Production;
 import com.petrichor.ving.domain.Relation;
 import com.petrichor.ving.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/production")
 public class ProductionController {
@@ -56,7 +58,21 @@ public class ProductionController {
 
     @RequestMapping("/findByPTag")      //通过标签查询作品
     public List<Production> findByPTag(String pTag){
-        return productionRepos.findByPTag(pTag);
+        List<Production> productions_init=productionRepos.findAll();//初始数据集
+        List<Production> productions=new ArrayList<>(); //存储处理结果
+        for (Production production : productions_init){ //如果某作品的标签串中包含这个标签，则将这个作品放入结果集
+            boolean flag=false;
+            String[] tags=production.getpTag().split(";");
+            for(String tag : tags){
+                if(tag.equals(pTag)){
+                    flag=true;
+                    break;
+                }
+            }
+            if(flag)
+                productions.add(production);
+        }
+        return productions;
     }
 
     @RequestMapping("/findByPName")     //通过作品名查询作品
@@ -79,7 +95,7 @@ public class ProductionController {
         }
     }
 
-    @RequestMapping("/setPCover")
+    @RequestMapping("/setPCover")   //更新作品的封面，现在只修改了封面路径，还没有文件相关代码
     public void setPCover(String PID,String PCover, MultipartFile img){
         Optional<Production> optional=productionRepos.findById(PID);
         if(optional.isPresent()){
