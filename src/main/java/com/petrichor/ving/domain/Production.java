@@ -3,6 +3,7 @@ package com.petrichor.ving.domain;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import java.util.UUID;
 
 @Entity
 public class Production {
@@ -21,6 +22,16 @@ public class Production {
     private String pCover;
     @Column(name = "PDescription")
     private String pDescription;
+
+    public Production(){
+        this.pId="P-"+ UUID.randomUUID().toString().replace("-", "").substring(0, 10);;
+        uId="1";
+        pName="a";
+        pVisibility="0.5";
+        pTag="测试";
+        pCover="q://";
+        pDescription="测试";
+    }
 
     public String getpId() {
         return pId;

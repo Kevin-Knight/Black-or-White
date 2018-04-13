@@ -44,10 +44,10 @@ public class AlbumController {
         if (! userOpt.isPresent()) return false;
 
         //生成不重复的专辑ID并添加专辑信息
-        String str = "A-"+ UUID.randomUUID().toString().replace("-", "").substring(0, 10);;
+        String str = "A-"+ UUID.randomUUID().toString().replace("-", "").substring(0, 10);
         Optional<Album> albumOpt = albumRepos.findById(str);
         while (albumOpt.isPresent()) {
-            str = "A-"+ UUID.randomUUID().toString().replace("-", "").substring(0, 10);;
+            str = "A-"+ UUID.randomUUID().toString().replace("-", "").substring(0, 10);
             albumOpt = albumRepos.findById(str);
         }
         album.setaId(str);
