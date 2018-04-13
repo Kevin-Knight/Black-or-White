@@ -151,4 +151,32 @@ public class AlbumController {
 
         return true;
     }
+
+    /** 将作品移出到专辑
+     * @param aId   专辑Id
+     * @param pIds  作品Id
+     * @return  若添加成功则返回true，否则返回false
+     */
+    @CrossOrigin
+    @RequestMapping("/removeProductionsFromAlbum")
+    public boolean removeProductionsFromAlbum(String aId, List<String> pIds) {
+        //若专辑Id不存在或添加的作品集为空，则返回false
+        if (! albumRepos.findByAId(aId).isPresent() || pIds.isEmpty()) return false;
+
+        Optional<Relation> relationOpt;
+        for (String pId: pIds) {
+            //若作品Id对应的作品不存在则返回false
+            if (! productionRepos.findByPId(pId).isPresent()) return false;
+
+            relationOpt = relationRepos.findByAIdAAndPId(aId, pId);
+            //若无相应的专辑-作品关系，则返回false
+            if (! relationOpt.isPresent()) return false;
+            relationRepos.delete(relationOpt.get());
+
+            //若添加作品移出失败，则返回false
+            if (relationRepos.findByAIdAAndPId(aId, pId).isPresent()) return false;
+        }
+        return true;
+    }
+
 }
