@@ -167,13 +167,13 @@ public class AlbumController {
             //若作品Id对应的作品不存在则返回false
             if (! productionRepos.findByPId(pId).isPresent()) return false;
 
-            relationOpt = relationRepos.findByAIdAAndPId(aId, pId);
+            relationOpt = relationRepos.findByAIdAndPId(aId, pId);
             //若无相应的专辑-作品关系，则返回false
             if (! relationOpt.isPresent()) return false;
             relationRepos.delete(relationOpt.get());
 
             //若添加作品移出失败，则返回false
-            if (relationRepos.findByAIdAAndPId(aId, pId).isPresent()) return false;
+            if (relationRepos.findByAIdAndPId(aId, pId).isPresent()) return false;
         }
         return true;
     }

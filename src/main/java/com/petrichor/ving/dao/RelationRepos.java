@@ -10,5 +10,5 @@ public interface RelationRepos extends JpaRepository<Relation, String> {
     Optional<Relation> findByRId(String RId);
     List<Relation> findByAId(String AId);
     List<Relation> findByPId(String PId);
-    Optional<Relation> findByAIdAAndPId(String AId, String PId);
+    Optional<Relation> findByAIdAndPId(String AId, String PId);
 }
