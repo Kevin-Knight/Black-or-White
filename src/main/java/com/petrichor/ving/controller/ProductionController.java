@@ -85,6 +85,9 @@ public class ProductionController {
     @RequestMapping("/delete")      //通过作品对象删除作品
     public void delete(Production production){
         productionRepos.delete(production);
+        /*
+        作品删除也要删除文件
+         */
     }
 
     @RequestMapping("/setPVisibility") //更新作品的可见性

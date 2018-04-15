@@ -39,7 +39,6 @@ public class AlbumController {
      * @param album 作品信息
      * @return  若添加成功则返回true，否则返回false
      */
-    
     @RequestMapping("/addAlbum")
     public boolean addAlbum(Album album) {
         //检查用户是否存在
@@ -64,7 +63,6 @@ public class AlbumController {
      * @param aId 作品信息
      * @return  若删除成功则返回true，否则返回false
      */
-    
     @RequestMapping("/deleteAlbum")
     public boolean deleteAlbum(String aId) {
         //删除专辑-作品关系中的专辑记录
@@ -86,7 +84,6 @@ public class AlbumController {
      * @param aName 专辑名
      * @return  返回找到的专辑集合
      */
-    
     @RequestMapping("/findAlbumsByAlbumName")
     public List<Album> findAlbumsByAlbumName (String aName) {
         return albumRepos.findByAName(aName);
@@ -96,7 +93,6 @@ public class AlbumController {
      * @param aName 专辑名
      * @return  返回找到的作品集合
      */
-    
     @RequestMapping("/findProductionsByAlbumName")
     public List<Production> findProductionsByAlbumName (String aName) {
         List<Production> productions= new ArrayList<>();
@@ -123,7 +119,6 @@ public class AlbumController {
      * @param pIds  作品Id
      * @return  若添加成功则返回true，否则返回false
      */
-    
     @RequestMapping("/addProductionsToAlbum")
     public boolean addProductionsToAlbum (String aId, List<String> pIds) {
         //若专辑Id不存在或添加的作品集为空，则返回false
@@ -156,7 +151,6 @@ public class AlbumController {
      * @param pIds  作品Id
      * @return  若添加成功则返回true，否则返回false
      */
-    
     @RequestMapping("/removeProductionsFromAlbum")
     public boolean removeProductionsFromAlbum(String aId, List<String> pIds) {
         //若专辑Id不存在或添加的作品集为空，则返回false
@@ -183,7 +177,6 @@ public class AlbumController {
      * @param aVisibility   拟设置的专辑可见性
      * @return  若设置成功则返回true，否则返回false
      */
-    
     @RequestMapping("/setAVisibility")
     public boolean setAVisibility (String aId, String aVisibility) {
         //若专辑Id不存在或可见性不符合要求，则返回false
@@ -204,7 +197,6 @@ public class AlbumController {
      * @param aTag  拟设置的标签
      * @return  若设置成功则返回true，否则返回false
      */
-    
     @RequestMapping("/setATag")
     public boolean setATag(String aId, String aTag) {
         //若专辑Id不存在或标签值为空，则返回false
@@ -225,7 +217,6 @@ public class AlbumController {
      * @param aDesciption   拟设置的描述
      * @return  若设置成功则返回true，否则返回false
      */
-    
     @RequestMapping("/setADescription")
     public boolean setADescription (String aId, String aDesciption) {
         //若专辑Id不存在或描述值为空，则返回false
@@ -241,4 +232,26 @@ public class AlbumController {
         return albumRepos.findByAId(aId).get().getaDescription().equals(aDesciption);
     }
 
+    /** 设置专辑封面
+     * @param aId   专辑Id
+     * @param cover 专辑封面
+     * @return  若设置成功则返回true，否则返回false
+     */
+    @RequestMapping("/setADescription")
+    public boolean setACover (String aId, MultipartFile cover) {
+        //若专辑Id不存在或封面上传失败，则返回false
+        Optional<Album> albumOpt = albumRepos.findById(aId);
+        if (! albumOpt.isPresent() || cover.isEmpty()) return false;
+
+        //设置封面位置
+        Album album = albumOpt.get();
+        String dir = album.getuId()+"/album/"+album.getaId()+"/cover.png";
+        album.setaCover(dir);
+        albumRepos.save(album);
+
+        //上传封面文件
+        //暂未实现
+
+        return true;
+    }
 }
