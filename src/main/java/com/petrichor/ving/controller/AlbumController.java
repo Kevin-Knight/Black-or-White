@@ -237,7 +237,7 @@ public class AlbumController {
      * @param cover 专辑封面
      * @return  若设置成功则返回true，否则返回false
      */
-    @RequestMapping("/setADescription")
+    @RequestMapping("/setACover")
     public boolean setACover (String aId, MultipartFile cover) {
         //若专辑Id不存在或封面上传失败，则返回false
         Optional<Album> albumOpt = albumRepos.findById(aId);

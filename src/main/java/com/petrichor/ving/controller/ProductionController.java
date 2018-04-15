@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -101,13 +102,44 @@ public class ProductionController {
     }
 
     @RequestMapping("/setPCover")   //更新作品的封面，现在只修改了封面路径，还没有文件相关代码
-    public void setPCover(String PID,String PCover, MultipartFile img){
+    public void setPCover(String PID,MultipartFile img){
         Optional<Production> optional=productionRepos.findById(PID);
-        if(optional.isPresent()){
-            Production production=optional.get();
-            production.setpCover(PCover);
-            productionRepos.save(production);
+        if(optional.isPresent()&&!img.isEmpty()){
+            Production production=optional.get();   //获得作品对象
+            String uId=production.getuId();         //获得作品的作者id
+
+            String separator= File.separator;   //路径分隔符，Linux下是/而Windows下是\
+            String dirPath_upload="http://47.100.111.185"+separator+uId+separator+"production"+separator+"cover"+separator;//定义文件夹路径
+            File dir_upload=new File(dirPath_upload);
+            Boolean createStatus=true;
+            if(!dir_upload.exists()) {      //如果目标文件夹不存在，则递归创建文件夹
+                createStatus=dir_upload.mkdirs();
+            }
+
+            if(createStatus){       //如果文件夹创建成功才执行下述操作
+                String uploadPath=dirPath_upload+img.getOriginalFilename();//文件路径是文件夹路径加上文件名
+                File uploadFile=new File(uploadPath);
+                try {
+                    BufferedOutputStream out = new BufferedOutputStream(
+                            new FileOutputStream(uploadFile)); //根据文件类生成输出流
+
+                    out.write(img.getBytes());//通过输出流将上传的文件写入到文件路径中
+                    out.flush();//清空缓存
+                    out.close();//关闭输出流
+
+                    production.setpCover(uploadPath);
+                    productionRepos.save(production);   //上传成功后修改数据库中的文件路径
+
+                } catch (FileNotFoundException e) {//当出现文件找不到错误时执行的代码，一般用不到
+                    e.printStackTrace();
+                } catch (IOException e) {//当出现输入输出错误时执行的代码，一般用不到
+                    e.printStackTrace();
+                }
+            }
+
         }
+
+
     }
 
 }
