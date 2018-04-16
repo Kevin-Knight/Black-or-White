@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -244,13 +245,45 @@ public class AlbumController {
         if (! albumOpt.isPresent() || cover.isEmpty()) return false;
 
         //设置封面位置
+        String separator= File.separator;
         Album album = albumOpt.get();
-        String dir = album.getuId()+"/album/"+album.getaId()+"/cover.png";
-        album.setaCover(dir);
+        String coverPath = album.getuId() + separator +"production" + separator + "cover.png";
+        album.setaCover(coverPath);
         albumRepos.save(album);
 
+        //创建封面路径
+        String serverPath="http://47.100.111.185";
+        File dir_upload=new File(serverPath + separator+album.getuId()
+                + separator + "production" + separator);
+        boolean createStatus=true;
+        if(!dir_upload.exists()) {
+            //如果目标文件夹不存在，则递归创建文件夹
+            createStatus=dir_upload.mkdirs();
+        }
+        //若文件夹创建失败，则返回false
+        if (!createStatus) return false;
+
         //上传封面文件
-        //暂未实现
+        String uploadPath=serverPath + separator + coverPath;
+        File uploadFile=new File(uploadPath);
+        try {
+            //根据文件类生成输出流
+            BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(uploadFile));
+            //通过输出流将上传的文件写入到文件路径中
+            out.write(cover.getBytes());
+            //清空缓冲
+            out.flush();
+            //关闭输出流
+            out.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            System.err.println(e.getMessage());
+            return false;
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println(e.getMessage());
+            return false;
+        }
 
         return true;
     }

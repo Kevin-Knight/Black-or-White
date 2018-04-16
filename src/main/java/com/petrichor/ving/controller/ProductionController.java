@@ -109,15 +109,16 @@ public class ProductionController {
             String uId=production.getuId();         //获得作品的作者id
 
             String separator= File.separator;   //路径分隔符，Linux下是/而Windows下是\
-            String dirPath_upload="http://47.100.111.185"+separator+uId+separator+"production"+separator+"cover"+separator;//定义文件夹路径
-            File dir_upload=new File(dirPath_upload);
-            Boolean createStatus=true;
+            String serverPath="http://47.100.111.185";//定义文件服务器路径
+            String coverPath = uId+separator +"production"+separator+"cover.png";//定义文件相对路径
+            File dir_upload=new File(serverPath+separator+uId+"production"+separator);
+            boolean createStatus=true;
             if(!dir_upload.exists()) {      //如果目标文件夹不存在，则递归创建文件夹
                 createStatus=dir_upload.mkdirs();
             }
 
             if(createStatus){       //如果文件夹创建成功才执行下述操作
-                String uploadPath=dirPath_upload+img.getOriginalFilename();//文件路径是文件夹路径加上文件名
+                String uploadPath=serverPath+separator+coverPath;//文件路径是文件夹路径加上文件名
                 File uploadFile=new File(uploadPath);
                 try {
                     BufferedOutputStream out = new BufferedOutputStream(
@@ -127,7 +128,7 @@ public class ProductionController {
                     out.flush();//清空缓存
                     out.close();//关闭输出流
 
-                    production.setpCover(uploadPath);
+                    production.setpCover(coverPath);
                     productionRepos.save(production);   //上传成功后修改数据库中的文件路径
 
                 } catch (FileNotFoundException e) {//当出现文件找不到错误时执行的代码，一般用不到
