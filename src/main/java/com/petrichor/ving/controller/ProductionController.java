@@ -103,6 +103,46 @@ public class ProductionController {
         }
     }
 
+    /** 设置作品标签
+     * @param pId   作品Id
+     * @param pTag  拟设置的标签
+     * @return  若设置成功则返回true，否则返回false
+     */
+    @RequestMapping("/setPTag")
+    public boolean setPTag(String pId, String pTag) {
+        //若作品Id不存在或标签值为空，则返回false
+        Optional<Production> productionOpt = productionRepos.findById(pId);
+        if (! productionOpt.isPresent() || pTag.length()==0) return false;
+
+        //设置标签并保存
+        Production production = productionOpt.get();
+        production.setpTag(pTag);
+        productionRepos.save(production);
+
+        //若设置标签失败则返回false
+        return productionRepos.findByPId(pId).get().getpTag().equals(pTag);
+    }
+
+    /** 设置作品描述
+     * @param pId   作品Id
+     * @param pDesciption  拟设置的描述
+     * @return  若设置成功则返回true，否则返回false
+     */
+    @RequestMapping("/setPDescription")
+    public boolean setPDescription (String pId, String pDesciption) {
+        //若作品Id不存在或标签值为空，则返回false
+        Optional<Production> productionOpt = productionRepos.findById(pId);
+        if (! productionOpt.isPresent() || pDesciption.length()==0) return false;
+
+        //设置描述并保存
+        Production production = productionOpt.get();
+        production.setpDescription(pDesciption);
+        productionRepos.save(production);
+
+        //若设置描述失败则返回false
+        return productionRepos.findByPId(pId).get().getpDescription().equals(pDesciption);
+    }
+
     @RequestMapping("/setPCover")   //更新作品的封面，现在只修改了封面路径，还没有文件相关代码
     public void setPCover(String PID,MultipartFile img){
         Optional<Production> optional=productionRepos.findById(PID);
@@ -144,4 +184,57 @@ public class ProductionController {
 
     }
 
+    /** 设置作品封面
+     * @param pId   作品Id
+     * @param cover 作品封面
+     * @return  若设置成功则返回true，否则返回false
+     */
+    @RequestMapping("/setACover")
+    public boolean setACover (String pId, MultipartFile cover) {
+        //若作品Id不存在或标签值为空，则返回false
+        Optional<Production> productionOpt = productionRepos.findById(pId);
+        if (! productionOpt.isPresent() || cover.isEmpty()) return false;
+
+        //设置封面位置
+        String separator= File.separator;
+        Production production = productionOpt.get();
+        String coverPath = production.getuId() + separator
+                + "production" + separator + pId + separator;
+        production.setpCover(coverPath + "cover.png");
+        productionRepos.save(production);
+
+        //创建封面路径
+        File dir_upload=new File(serverPath + coverPath);
+        boolean createStatus=true;
+        if(!dir_upload.exists()) {
+            //如果目标文件夹不存在，则递归创建文件夹
+            createStatus=dir_upload.mkdirs();
+        }
+        //若文件夹创建失败，则返回false
+        if (!createStatus) return false;
+
+        //上传封面文件
+        String uploadPath=serverPath + separator + coverPath + "cover.png";
+        File uploadFile=new File(uploadPath);
+        try {
+            //根据文件类生成输出流
+            BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(uploadFile));
+            //通过输出流将上传的文件写入到文件路径中
+            out.write(cover.getBytes());
+            //清空缓冲
+            out.flush();
+            //关闭输出流
+            out.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            System.err.println(e.getMessage());
+            return false;
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println(e.getMessage());
+            return false;
+        }
+
+        return true;
+    }
 }

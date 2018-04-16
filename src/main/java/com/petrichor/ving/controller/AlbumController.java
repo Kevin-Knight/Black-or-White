@@ -249,13 +249,12 @@ public class AlbumController {
         //设置封面位置
         String separator= File.separator;
         Album album = albumOpt.get();
-        String coverPath = album.getuId() + separator +"production" + separator + "cover.png";
-        album.setaCover(coverPath);
+        String coverPath = album.getuId() + separator +"album" + separator + aId + separator;
+        album.setaCover(coverPath + "cover.png");
         albumRepos.save(album);
 
         //创建封面路径
-        File dir_upload=new File(serverPath + separator+album.getuId()
-                + separator + "production" + separator);
+        File dir_upload=new File(serverPath + coverPath);
         boolean createStatus=true;
         if(!dir_upload.exists()) {
             //如果目标文件夹不存在，则递归创建文件夹
@@ -265,7 +264,7 @@ public class AlbumController {
         if (!createStatus) return false;
 
         //上传封面文件
-        String uploadPath=serverPath + separator + coverPath;
+        String uploadPath=serverPath + separator + coverPath + "cover.png";
         File uploadFile=new File(uploadPath);
         try {
             //根据文件类生成输出流
