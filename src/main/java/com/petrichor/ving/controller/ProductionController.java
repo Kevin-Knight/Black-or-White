@@ -23,6 +23,8 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/production")
 public class ProductionController {
+    //服务器路径
+    private final String serverPath="http://47.100.111.185";
     @Autowired
     ProductionRepos productionRepos;
     @Autowired
@@ -109,7 +111,6 @@ public class ProductionController {
             String uId=production.getuId();         //获得作品的作者id
 
             String separator= File.separator;   //路径分隔符，Linux下是/而Windows下是\
-            String serverPath="http://47.100.111.185";//定义文件服务器路径
             String coverPath = uId+separator +"production"+separator+"cover.png";//定义文件相对路径
             File dir_upload=new File(serverPath+separator+uId+"production"+separator);
             boolean createStatus=true;

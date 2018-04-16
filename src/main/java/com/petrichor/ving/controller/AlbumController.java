@@ -27,6 +27,8 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/album")
 public class AlbumController {
+    //服务器路径
+    private final String serverPath="http://47.100.111.185";
     @Autowired
     RelationRepos relationRepos;
     @Autowired
@@ -252,7 +254,6 @@ public class AlbumController {
         albumRepos.save(album);
 
         //创建封面路径
-        String serverPath="http://47.100.111.185";
         File dir_upload=new File(serverPath + separator+album.getuId()
                 + separator + "production" + separator);
         boolean createStatus=true;
