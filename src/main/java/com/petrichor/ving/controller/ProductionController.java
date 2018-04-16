@@ -143,54 +143,13 @@ public class ProductionController {
         return productionRepos.findByPId(pId).get().getpDescription().equals(pDesciption);
     }
 
-    @RequestMapping("/setPCover")   //更新作品的封面，现在只修改了封面路径，还没有文件相关代码
-    public void setPCover(String PID,MultipartFile img){
-        Optional<Production> optional=productionRepos.findById(PID);
-        if(optional.isPresent()&&!img.isEmpty()){
-            Production production=optional.get();   //获得作品对象
-            String uId=production.getuId();         //获得作品的作者id
-
-            String separator= File.separator;   //路径分隔符，Linux下是/而Windows下是\
-            String coverPath = uId+separator +"production"+separator+"cover.png";//定义文件相对路径
-            File dir_upload=new File(serverPath+separator+uId+"production"+separator);
-            boolean createStatus=true;
-            if(!dir_upload.exists()) {      //如果目标文件夹不存在，则递归创建文件夹
-                createStatus=dir_upload.mkdirs();
-            }
-
-            if(createStatus){       //如果文件夹创建成功才执行下述操作
-                String uploadPath=serverPath+separator+coverPath;//文件路径是文件夹路径加上文件名
-                File uploadFile=new File(uploadPath);
-                try {
-                    BufferedOutputStream out = new BufferedOutputStream(
-                            new FileOutputStream(uploadFile)); //根据文件类生成输出流
-
-                    out.write(img.getBytes());//通过输出流将上传的文件写入到文件路径中
-                    out.flush();//清空缓存
-                    out.close();//关闭输出流
-
-                    production.setpCover(coverPath);
-                    productionRepos.save(production);   //上传成功后修改数据库中的文件路径
-
-                } catch (FileNotFoundException e) {//当出现文件找不到错误时执行的代码，一般用不到
-                    e.printStackTrace();
-                } catch (IOException e) {//当出现输入输出错误时执行的代码，一般用不到
-                    e.printStackTrace();
-                }
-            }
-
-        }
-
-
-    }
-
     /** 设置作品封面
      * @param pId   作品Id
      * @param cover 作品封面
      * @return  若设置成功则返回true，否则返回false
      */
-    @RequestMapping("/setACover")
-    public boolean setACover (String pId, MultipartFile cover) {
+    @RequestMapping("/setPCover")
+    public boolean setPCover (String pId, MultipartFile cover) {
         //若作品Id不存在或标签值为空，则返回false
         Optional<Production> productionOpt = productionRepos.findById(pId);
         if (! productionOpt.isPresent() || cover.isEmpty()) return false;
