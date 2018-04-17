@@ -312,11 +312,71 @@ public class AlbumController {
 
     /**
      * 通过用户ID查找专辑
-     * @param uId
+     * @param uId 用户Id
      * @return
      */
-    @RequestMapping("findByUId")
+    @RequestMapping("/findByUId")
     public List<Album> findByUId(String uId){
         return albumRepos.findByUId(uId);
+    }
+
+    /** 自定义专辑的封面、标签、描述
+     * @param album 拟自定义的专辑
+     * @param cover 封面图片
+     * @return
+     */
+    @RequestMapping("/setAInfo")
+    public boolean setAInfo(Album album, MultipartFile cover) {
+        //若专辑不存在则返回false
+        Optional<Album> albumOpt = albumRepos.findByAId(album.getaId());
+        if (!albumOpt.isPresent()) return false;
+
+        //自定义封面
+        if (! cover.isEmpty()) {
+            //设置封面位置
+            String separator= File.separator;
+            String coverPath = album.getuId() + separator +"album"
+                    + separator + album.getaId() + separator;
+            album.setaCover(coverPath + "cover.png");
+
+            //创建封面路径
+            File dir_upload=new File(serverPath + coverPath);
+            boolean createStatus=true;
+            if(!dir_upload.exists()) {
+                //如果目标文件夹不存在，则递归创建文件夹
+                createStatus=dir_upload.mkdirs();
+            }
+            //若文件夹创建失败，则返回false
+            if (!createStatus) return false;
+
+            //上传封面文件
+            String uploadPath=serverPath + separator + coverPath + "cover.png";
+            File uploadFile=new File(uploadPath);
+            try {
+                //根据文件类生成输出流
+                BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(uploadFile));
+                //通过输出流将上传的文件写入到文件路径中
+                out.write(cover.getBytes());
+                //清空缓冲
+                out.flush();
+                //关闭输出流
+                out.close();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                System.out.println("setAInfo----FileNotFoundException");
+                System.err.println(e.getMessage());
+                return false;
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.out.println("setAInfo----IOException");
+                System.err.println(e.getMessage());
+                return false;
+            }
+        }
+
+        //保存自定义的专辑信息
+        albumRepos.save(album);
+
+        return albumRepos.findByAId(album.getaId()).get().equals(album);
     }
 }

@@ -26,6 +26,34 @@ public class Album {
 
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Album)) return false;
+
+        Album album = (Album) o;
+
+        if (!aId.equals(album.aId)) return false;
+        if (!uId.equals(album.uId)) return false;
+        if (!aName.equals(album.aName)) return false;
+        if (!aVisibility.equals(album.aVisibility)) return false;
+        if (!aTag.equals(album.aTag)) return false;
+        if (!aCover.equals(album.aCover)) return false;
+        return aDescription.equals(album.aDescription);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = aId.hashCode();
+        result = 31 * result + uId.hashCode();
+        result = 31 * result + aName.hashCode();
+        result = 31 * result + aVisibility.hashCode();
+        result = 31 * result + aTag.hashCode();
+        result = 31 * result + aCover.hashCode();
+        result = 31 * result + aDescription.hashCode();
+        return result;
+    }
+
     public String getaId() {
         return aId;
     }
