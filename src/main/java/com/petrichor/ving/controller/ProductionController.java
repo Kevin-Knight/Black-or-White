@@ -18,6 +18,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @CrossOrigin
 @RestController
@@ -25,6 +26,8 @@ import java.util.Optional;
 public class ProductionController {
     //服务器路径
     private final String serverPath="http://47.100.111.185";
+    //常见作品格式
+    private List<String> normalFormat = new ArrayList<>();
     @Autowired
     ProductionRepos productionRepos;
     @Autowired
@@ -33,6 +36,14 @@ public class ProductionController {
     UserRepos userRepos;
     @Autowired
     AlbumRepos albumRepos;
+
+    public ProductionController() {
+        //设置常见作品格式
+        normalFormat.add("mp3");
+        normalFormat.add("wav");
+        normalFormat.add("mp4");
+        normalFormat.add("avi");
+    }
 
     @RequestMapping("/findByUserName")  //通过用户名查询作品
     public List<Production> findByUserName(String name){
@@ -83,6 +94,73 @@ public class ProductionController {
     @RequestMapping("/findByPName")     //通过作品名查询作品
     public List<Production> findByPName(String name){
         return productionRepos.findByPName(name);
+    }
+
+    /** 添加作品
+     * @param production 上传的作品
+     * @return
+     */
+    @RequestMapping("/addProduction")
+    public boolean addProduction(Production production, MultipartFile pFile) {
+        //检查用户是否存在
+        Optional<User> userOpt = userRepos.findByUId(production.getuId());
+        if (! userOpt.isPresent()) {
+            System.out.println("用户不存在---上传作品失败！");
+            return false;
+        }
+
+        //生成不重复的作品ID并添加作品信息
+        String str = "P-"+ UUID.randomUUID().toString().replace("-", "").substring(0, 10);
+        Optional<Production> productionOpt = productionRepos.findByPId(str);
+        while (productionOpt.isPresent()) {
+            str = "P-"+ UUID.randomUUID().toString().replace("-", "").substring(0, 10);
+            productionOpt = productionRepos.findByPId(str);
+        }
+        production.setpId(str);
+        productionRepos.save(production);
+        if (! productionRepos.findByPId(str).isPresent()) {
+            System.out.println("创建作品信息记录失败！");
+            return false;
+        }
+
+        //创建作品上传文件夹
+        String separator= File.separator;
+        String filePath = serverPath + separator + production.getuId() + separator
+                + "production" + separator + production.getpId() + separator;
+        File dir_upload=new File(filePath);
+        boolean createStatus=true;
+        if(!dir_upload.exists()) {
+            //如果目标文件夹不存在，则递归创建文件夹
+            createStatus=dir_upload.mkdirs();
+        }
+        //若文件夹创建失败，则返回false
+        if (!createStatus) {
+            System.out.println("创建文件夹失败！");
+            return false;
+        }
+
+        //上传作品
+        File uploadFile=new File(dir_upload + "production.mp3");
+        try {
+            //根据文件类生成输出流
+            BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(uploadFile));
+            //通过输出流将上传的文件写入到文件路径中
+            out.write(pFile.getBytes());
+            //清空缓冲
+            out.flush();
+            //关闭输出流
+            out.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            System.out.println("作品上传失败----FileNotFoundException");
+            return false;
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("作品上传失败----IOException");
+            return false;
+        }
+
+        return true;
     }
 
     /** 通过作品对象删除作品
