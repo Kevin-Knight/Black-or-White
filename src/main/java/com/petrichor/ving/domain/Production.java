@@ -33,6 +33,34 @@ public class Production {
         pDescription="测试";
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Production)) return false;
+
+        Production that = (Production) o;
+
+        if (!pId.equals(that.pId)) return false;
+        if (!uId.equals(that.uId)) return false;
+        if (pName != null ? !pName.equals(that.pName) : that.pName != null) return false;
+        if (pVisibility != null ? !pVisibility.equals(that.pVisibility) : that.pVisibility != null) return false;
+        if (pTag != null ? !pTag.equals(that.pTag) : that.pTag != null) return false;
+        if (pCover != null ? !pCover.equals(that.pCover) : that.pCover != null) return false;
+        return pDescription != null ? pDescription.equals(that.pDescription) : that.pDescription == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = pId.hashCode();
+        result = 31 * result + uId.hashCode();
+        result = 31 * result + (pName != null ? pName.hashCode() : 0);
+        result = 31 * result + (pVisibility != null ? pVisibility.hashCode() : 0);
+        result = 31 * result + (pTag != null ? pTag.hashCode() : 0);
+        result = 31 * result + (pCover != null ? pCover.hashCode() : 0);
+        result = 31 * result + (pDescription != null ? pDescription.hashCode() : 0);
+        return result;
+    }
+
     public String getpId() {
         return pId;
     }

@@ -35,22 +35,22 @@ public class Album {
 
         if (!aId.equals(album.aId)) return false;
         if (!uId.equals(album.uId)) return false;
-        if (!aName.equals(album.aName)) return false;
-        if (!aVisibility.equals(album.aVisibility)) return false;
-        if (!aTag.equals(album.aTag)) return false;
-        if (!aCover.equals(album.aCover)) return false;
-        return aDescription.equals(album.aDescription);
+        if (aName != null ? !aName.equals(album.aName) : album.aName != null) return false;
+        if (aVisibility != null ? !aVisibility.equals(album.aVisibility) : album.aVisibility != null) return false;
+        if (aTag != null ? !aTag.equals(album.aTag) : album.aTag != null) return false;
+        if (aCover != null ? !aCover.equals(album.aCover) : album.aCover != null) return false;
+        return aDescription != null ? aDescription.equals(album.aDescription) : album.aDescription == null;
     }
 
     @Override
     public int hashCode() {
         int result = aId.hashCode();
         result = 31 * result + uId.hashCode();
-        result = 31 * result + aName.hashCode();
-        result = 31 * result + aVisibility.hashCode();
-        result = 31 * result + aTag.hashCode();
-        result = 31 * result + aCover.hashCode();
-        result = 31 * result + aDescription.hashCode();
+        result = 31 * result + (aName != null ? aName.hashCode() : 0);
+        result = 31 * result + (aVisibility != null ? aVisibility.hashCode() : 0);
+        result = 31 * result + (aTag != null ? aTag.hashCode() : 0);
+        result = 31 * result + (aCover != null ? aCover.hashCode() : 0);
+        result = 31 * result + (aDescription != null ? aDescription.hashCode() : 0);
         return result;
     }
 
