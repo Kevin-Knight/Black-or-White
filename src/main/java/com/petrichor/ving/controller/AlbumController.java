@@ -287,4 +287,36 @@ public class AlbumController {
 
         return true;
     }
+
+    /**
+     * 通过专辑名找属于特定用户的作品，用于查看和编辑
+     * @param aName-专辑名
+     * @param uId-用户ID
+     * @return 返回找到的作品
+     */
+    @RequestMapping("/findProductionsByAlbumNameAndUId")
+    public List<Production> findProductionsByAlbumNameAndUId(String aName,String uId){
+        List<Album> albums=albumRepos.findByAName(aName);
+        List<Production> productions=new ArrayList<>();
+        for (Album album:albums){
+            if(uId.equals(album.getuId())){
+                List<Relation> relations=relationRepos.findByAId(album.getaId());
+                for(Relation relation:relations){
+                    Optional<Production> productionOpt=productionRepos.findByPId(relation.getpId());
+                    productionOpt.ifPresent(productions::add);
+                }
+            }
+        }
+        return productions;
+    }
+
+    /**
+     * 通过用户ID查找专辑
+     * @param uId
+     * @return
+     */
+    @RequestMapping("findByUId")
+    public List<Album> findByUId(String uId){
+        return albumRepos.findByUId(uId);
+    }
 }
