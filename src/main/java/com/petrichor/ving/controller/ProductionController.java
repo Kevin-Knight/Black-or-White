@@ -85,12 +85,42 @@ public class ProductionController {
         return productionRepos.findByPName(name);
     }
 
-    @RequestMapping("/delete")      //通过作品对象删除作品
-    public void delete(Production production){
+    /** 通过作品对象删除作品
+     * @param production 作品对象
+     * @return
+     */
+    @RequestMapping("/delete")
+    public boolean delete(Production production){
+        //若作品不存在则返回false
+        Optional<Production> productionOpt = productionRepos.findByPId(production.getpId());
+        if (!productionOpt.isPresent()) {
+            System.out.println("删除作品失败-----作品记录不存在！");
+            return false;
+        }
+
+        //删除作品文件
+        String separator= File.separator;
+        String filePath = serverPath + separator + production.getuId()
+                + separator + "production" + separator + production.getpId()
+                + separator + "production.*";
+        File file = new File(filePath);
+        if (!file.exists()) {
+            System.out.println("删除作品失败-----作品文件不存在！");
+            return false;
+        }
+        if (!file.delete()) {
+            System.out.println("删除作品失败！");
+            return false;
+        }
+
+        //删除作品对应的数据记录
+        List<Relation> relations = relationRepos.findByPId(production.getpId());
+        for (Relation r: relations) {
+            relationRepos.delete(r);
+        }
         productionRepos.delete(production);
-        /*
-        作品删除也要删除文件
-         */
+
+        return !productionRepos.findByPId(production.getpId()).isPresent();
     }
 
     @RequestMapping("/setPVisibility") //更新作品的可见性
