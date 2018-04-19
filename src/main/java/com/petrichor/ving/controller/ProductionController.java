@@ -45,6 +45,16 @@ public class ProductionController {
         normalFormat.add("avi");
     }
 
+    /**
+     * 通过uId查找这个用户的所有作品
+     * @param uId
+     * @return
+     */
+    @RequestMapping("/findByUId")
+    public List<Production> findByUId(String uId){
+        return productionRepos.findByUId(uId);
+    }
+
     @RequestMapping("/findByUserName")  //通过用户名查询作品
     public List<Production> findByUserName(String name){
         List<User> users=userRepos.findByUName(name);//获得用户名对应的所有用户

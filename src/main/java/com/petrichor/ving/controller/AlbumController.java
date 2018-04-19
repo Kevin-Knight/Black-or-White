@@ -28,7 +28,7 @@ import java.util.UUID;
 @RequestMapping("/album")
 public class AlbumController {
     //服务器路径
-    private final String serverPath="http://47.100.111.185";
+    private final String serverPath="http://47.100.111.185/";
     @Autowired
     RelationRepos relationRepos;
     @Autowired
@@ -43,7 +43,7 @@ public class AlbumController {
      * @return  若添加成功则返回true，否则返回false
      */
     @RequestMapping("/addAlbum")
-    public boolean addAlbum(Album album) {
+    public boolean addAlbum(Album album,MultipartFile cover) {
         //检查用户是否存在
         Optional<User> userOpt = userRepos.findByUId(album.getuId());
         if (! userOpt.isPresent()) return false;
@@ -59,7 +59,10 @@ public class AlbumController {
         albumRepos.save(album);
         //检查是否添加成功
         albumOpt = albumRepos.findById(str);
-        return albumOpt.isPresent();
+
+        //直接调用写好的设置封面方法
+        boolean coverStatus=setACover(str,cover);
+        return albumOpt.isPresent()&&coverStatus;
     }
 
     /** 删除指定专辑
@@ -264,7 +267,7 @@ public class AlbumController {
         if (!createStatus) return false;
 
         //上传封面文件
-        String uploadPath=serverPath + separator + coverPath + "cover.png";
+        String uploadPath=serverPath + coverPath + "cover.png";
         File uploadFile=new File(uploadPath);
         try {
             //根据文件类生成输出流
@@ -318,6 +321,22 @@ public class AlbumController {
     @RequestMapping("/findByUId")
     public List<Album> findByUId(String uId){
         return albumRepos.findByUId(uId);
+    }
+
+    /**
+     * 通过aid查找专辑下所有作品
+     * @param aId
+     * @return
+     */
+    @RequestMapping("/findProductionsByAId")
+    public List<Production> findProductionsByAId(String aId){
+        List<Relation> relations=relationRepos.findByAId(aId);
+        List<Production> productions=new ArrayList<>();
+        for(Relation relation:relations){
+            Optional<Production> productionOpt=productionRepos.findByPId(relation.getpId());
+            productionOpt.ifPresent(productions::add);
+        }
+        return productions;
     }
 
     /** 自定义专辑的封面、标签、描述
